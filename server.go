@@ -1,6 +1,10 @@
 package link
 
-import "net"
+import (
+	"log"
+
+	"net"
+)
 
 type Server struct {
 	manager      *Manager
@@ -37,8 +41,10 @@ func (server *Server) Listener() net.Listener {
 }
 
 func (server *Server) Serve() error {
+	log.Println("server loop")
 	for {
 		conn, err := Accept(server.listener)
+		log.Println("new accept")
 		if err != nil {
 			return err
 		}
@@ -49,6 +55,8 @@ func (server *Server) Serve() error {
 				conn.Close()
 				return
 			}
+
+			log.Println("new session")
 			session := server.manager.NewSession(codec, server.sendChanSize)
 			server.handler.HandleSession(session)
 		}()
